@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with <%= otherUser %></title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/styles/chat.css">
+</head>
+<body>
+<div class="chat-container">
+    <h1>Chat with <%= otherUser %></h1>
+    <div class="chat-box" id="messages">
+        <% chatMessages.forEach(msg => { %>
+            <div class="message <%= msg.sender === currentUser ? 'sent' : 'received' %>">
+                <%= msg.message %>
+            </div>
+        <% }) %>
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type a message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <button class="delete-chat" onclick="deleteChat()">Delete Chat</button>
+</div>
+
+<script>
+    const socket = io();
+    const currentUser = "<%= currentUser %>";
+    const otherUser = "<%= otherUser %>";
+    let newMessages = 0;
+    let isChatFocused = true;
+    const originalTitle = document.title;
+
+    socket.emit('joinChat', { sender: currentUser, receiver: otherUser });
+
+    function updateTitle() {
+        if (!isChatFocused && newMessages > 0) {
+            document.title = `\u{1F535} (${newMessages}) Chat with ${otherUser}`;
+        } else {
+            document.title = originalTitle;
+        }
+    }
+
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        if (message) {
+            socket.emit('sendMessage', { sender: currentUser, receiver: otherUser, message });
+            messageInput.value = '';
+        }
+    }
+
+    socket.on('receiveMessage', ({ sender, message }) => {
+        const messagesDiv = document.getElementById('messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender === currentUser ? 'sent' : 'received');
+        messageDiv.innerHTML = `${message}`;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        if (!isChatFocused) {
+            newMessages++;
+            updateTitle();
+        }
+    });
+
+    function deleteChat() {
+        document.getElementById('messages').innerHTML = ''; // Clears the chat box
+    }
+
+    window.addEventListener('focus', () => {
+        isChatFocused = true;
+        newMessages = 0;
+        updateTitle();
+    });
+
+    window.addEventListener('blur', () => {
+        isChatFocused = false;
+    });
+</script>
+</body>
+</html>

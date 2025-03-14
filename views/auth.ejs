@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register</title>
+    <link rel="stylesheet" href="/styles/auth.css">
+</head>
+<body>
+<div class="container">
+    <div class="form-container">
+        <div class="form-toggle">
+            <button id="login-btn" class="active">Login</button>
+            <button id="register-btn">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" action="/login" method="post">
+            <h2>Welcome Back!</h2>
+            <label>Email</label>
+            <input type="email" name="email" required>
+            <label>Password</label>
+            <input type="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <!-- Register Form (Hidden by Default) -->
+        <form id="register-form" action="/register" method="post" class="hidden">
+            <h2>Join Us!</h2>
+            <label>Email</label>
+            <input type="email" name="email" required>
+            <label>Password</label>
+            <input type="password" name="password" required>
+            <label>Confirm Password</label>
+            <input type="password" name="confirm_password" required>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</div>
+
+<script src="/scripts/auth.js"></script>
+</body>
+</html>
